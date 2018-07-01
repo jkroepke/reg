@@ -41,10 +41,11 @@ func Log(format string, args ...interface{}) {
 
 // Opt holds the options for a new registry.
 type Opt struct {
-	Insecure bool
-	Debug    bool
-	SkipPing bool
-	Timeout  time.Duration
+	Insecure  bool
+	Debug     bool
+	SkipPing  bool
+	Timeout   time.Duration
+	Headers   map[string]string
 }
 
 // New creates a new Registry struct with the given URL and credentials.
@@ -83,6 +84,10 @@ func newFromTransport(auth types.AuthConfig, transport http.RoundTripper, opt Op
 	errorTransport := &ErrorTransport{
 		Transport: basicAuthTransport,
 	}
+	customTransport := &CustomTransport{
+		Transport: errorTransport,
+		Headers: opt.Headers,
+	}
 
 	// set the logging
 	logf := Quiet
@@ -95,7 +100,7 @@ func newFromTransport(auth types.AuthConfig, transport http.RoundTripper, opt Op
 		Domain: reProtocol.ReplaceAllString(url, ""),
 		Client: &http.Client{
 			Timeout:   opt.Timeout,
-			Transport: errorTransport,
+			Transport: customTransport,
 		},
 		Username: auth.Username,
 		Password: auth.Password,
