@@ -57,6 +57,7 @@ func New(auth types.AuthConfig, opt Opt) (*Registry, error) {
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
+			DisableKeepAlives: true,
 		}
 	}
 
@@ -85,8 +86,8 @@ func newFromTransport(auth types.AuthConfig, transport http.RoundTripper, opt Op
 		Transport: basicAuthTransport,
 	}
 	customTransport := &CustomTransport{
-		Transport: errorTransport,
-		Headers: opt.Headers,
+		Transport:         errorTransport,
+		Headers:           opt.Headers,
 	}
 
 	// set the logging
